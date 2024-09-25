@@ -1,0 +1,26 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var checkoutForm = document.querySelector(".form-payment.order-form-v2");
+
+    if (checkoutForm) {
+            // Generate token for form submission
+            grecaptcha.ready(function() {
+                grecaptcha.execute('your_site_key', { action: 'submit' }).then(function(token) {
+                    // Insert token into hidden field in the form
+                    var recaptchaInput = document.getElementById('g-recaptcha-response');
+                    if (!recaptchaInput) {
+                        recaptchaInput = document.createElement("input");
+                        recaptchaInput.setAttribute("type", "hidden");
+                        recaptchaInput.setAttribute("id", "g-recaptcha-response");
+                        recaptchaInput.setAttribute("name", "g-recaptcha-response");
+                        checkoutForm.appendChild(recaptchaInput);
+                    }
+                    recaptchaInput.value = token;
+
+                    // Submit the form after the token is set
+                    // checkoutForm.submit();
+                });
+            });
+    }
+});
+</script>

@@ -1,2 +1,44 @@
-<button class="g-recaptcha" data-sitekey="6LeBXUgqAAAAABmOibfB5tV7FKIrFAoO3g1mX8Sy " data-callback='onSubmit' data-action='submit'>Submit</button>
-<!-- <div class="g-recaptcha" data-sitekey="6LeBXUgqAAAAABmOibfB5tV7FKIrFAoO3g1mX8Sy"></div> -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var checkoutForm = document.querySelector(".form-payment.order-form-v2");
+
+        if (checkoutForm) {
+            checkoutForm.addEventListener("submit", function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Generate reCAPTCHA token
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('your_site_key', { action: 'submit' }).then(function(token) {
+                        // Send the token to Google's reCAPTCHA API for verification
+                        verifyRecaptchaToken(token);
+                    });
+                });
+            });
+        }
+
+        // This function verifies the token by making a request to Google's reCAPTCHA API
+        function verifyRecaptchaToken(token) {
+            // WARNING: This is insecure, just for demonstration
+            const secretKey = 'your_secret_key'; // This should NOT be exposed in the client
+
+            // Call Google's reCAPTCHA API with `fetch`
+            fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.score >= 0.5) {
+                    // reCAPTCHA was successful
+                    alert('reCAPTCHA verified successfully. Submitting form.');
+                    checkoutForm.submit(); // Now submit the form
+                } else {
+                    // reCAPTCHA failed
+                    alert('reCAPTCHA verification failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying reCAPTCHA:', error);
+            });
+        }
+    });
+</script>
